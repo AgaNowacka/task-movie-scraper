@@ -2,7 +2,6 @@ import * as cheerio from "cheerio";
 import fetch from "node-fetch";
 import createCsvWriter from "csv-writer";
 
-
 const urls = [
   { url: "https://www.filmweb.pl/ranking/vod/netflix/film/2023", service: "Netflix" },
   { url: "https://www.filmweb.pl/ranking/vod/hbo_max/film/2023", service: "HboMax" },
@@ -41,36 +40,49 @@ async function getMovies() {
 
     allMovies.sort((a, b) => b.movieRating - a.movieRating);
 
-
     return allMovies;
   } catch (error) {
     console.log(error);
-    return []; 
+    return [];
   }
 }
 
-async function saveToCSV(movies) {
-    const csvWriter = createCsvWriter.createObjectCsvWriter({
-      path: "movies.csv",
-      header: [
-        { id: "index", title: "Index" },
-        { id: "movieTitle", title: "Title" },
-        { id: "service", title: "Service name" },
-        { id: "movieRating", title: "Rating" },
-      ],
-    });
-
-    const moviesWithIndex = movies.map((movie, index) => ({ ...movie, index: index + 1 }));
-    await csvWriter.writeRecords(moviesWithIndex);
-}
-  
- async function main() {
-    try {
-      const movies = await getMovies();
-      await saveToCSV(movies);
-      console.log("Dane zostały zapisane do pliku movies.csv.");
-    } catch (error) {
-      console.log("Wystąpił błąd:", error);
+async function deduplicate(movies) {
+  const uniqueMovies = {};
+  movies.forEach((movie) => {
+    const { movieTitle, movieRating } = movie;
+    if (!uniqueMovies[movieTitle] || uniqueMovies[movieTitle].movieRating < movieRating) {
+      uniqueMovies[movieTitle] = movie;
     }
-}  
-  main();
+  });
+
+  return Object.values(uniqueMovies);
+}
+
+async function saveToCSV(movies) {
+  const csvWriter = createCsvWriter.createObjectCsvWriter({
+    path: "movies.csv",
+    header: [
+      { id: "index", title: "Index" },
+      { id: "movieTitle", title: "Title" },
+      { id: "service", title: "Service name" },
+      { id: "movieRating", title: "Rating" },
+    ],
+  });
+
+  const moviesWithIndex = movies.map((movie, index) => ({ ...movie, index: index + 1 }));
+  await csvWriter.writeRecords(moviesWithIndex);
+}
+
+async function main() {
+  try {
+    const movies = await getMovies();
+    const deduplicatedMovies = await deduplicate(movies);
+    await saveToCSV(deduplicatedMovies);
+    console.log("Dane zostały zapisane do pliku movies.csv.");
+  } catch (error) {
+    console.log("Wystąpił błąd:", error);
+  }
+}
+
+main();

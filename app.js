@@ -60,7 +60,8 @@ async function saveToCSV(movies) {
       ],
     });
 
-    await csvWriter.writeRecords(movies);
+    const moviesWithIndex = movies.map((movie, index) => ({ ...movie, index: index + 1 }));
+    await csvWriter.writeRecords(moviesWithIndex);
 }
   
  async function main() {

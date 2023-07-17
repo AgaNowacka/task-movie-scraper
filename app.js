@@ -38,6 +38,8 @@ async function getMovies() {
       });
     }
 
+    allMovies.sort((a, b) => b.movieRating - a.movieRating);
+
 
     return allMovies;
   } catch (error) {

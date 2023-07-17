@@ -1,5 +1,6 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
+import createCsvWriter from "csv-writer";
 
 
 const urls = [
@@ -48,14 +49,27 @@ async function getMovies() {
   }
 }
 
+async function saveToCSV(movies) {
+    const csvWriter = createCsvWriter.createObjectCsvWriter({
+      path: "movies.csv",
+      header: [
+        { id: "index", title: "Index" },
+        { id: "movieTitle", title: "Title" },
+        { id: "service", title: "Service name" },
+        { id: "movieRating", title: "Rating" },
+      ],
+    });
 
-async function main() {
-  try {
-   
-    
-  } catch (error) {
-    console.log("Wystąpił błąd:", error);
-  }
+    await csvWriter.writeRecords(movies);
 }
-
-main();
+  
+ async function main() {
+    try {
+      const movies = await getMovies();
+      await saveToCSV(movies);
+      console.log("Dane zostały zapisane do pliku movies.csv.");
+    } catch (error) {
+      console.log("Wystąpił błąd:", error);
+    }
+}  
+  main();

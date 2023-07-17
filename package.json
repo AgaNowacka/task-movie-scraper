@@ -13,6 +13,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
     "csv-writer": "^1.6.0",
+    "fs": "^0.0.1-security",
     "node-fetch": "^3.3.1"
   }
 }

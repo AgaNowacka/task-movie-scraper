@@ -1,6 +1,6 @@
 import * as cheerio from "cheerio";
 import fetch from "node-fetch";
-import createCsvWriter from "csv-writer";
+import fs from "fs";
 
 const urls = [
   { url: "https://www.filmweb.pl/ranking/vod/netflix/film/2023", service: "Netflix" },
@@ -60,18 +60,21 @@ async function deduplicate(movies) {
 }
 
 async function saveToCSV(movies) {
-  const csvWriter = createCsvWriter.createObjectCsvWriter({
-    path: "movies.csv",
-    header: [
-      { id: "index", title: "Index" },
-      { id: "movieTitle", title: "Title" },
-      { id: "service", title: "Service name" },
-      { id: "movieRating", title: "Rating" },
-    ],
-  });
+  try {
+    let csvContent = "Index Title ServiceName Rating\n"; 
 
-  const moviesWithIndex = movies.map((movie, index) => ({ ...movie, index: index + 1 }));
-  await csvWriter.writeRecords(moviesWithIndex);
+    movies.forEach((movie, index) => {
+      const { movieTitle, service, movieRating } = movie;
+      const csvRow = `${index + 1}. ${movieTitle}, ${service}, ${movieRating}\n`;
+      csvContent += csvRow;
+    });
+
+    fs.writeFileSync("movies.csv", csvContent);
+
+    console.log("Dane zostały zapisane do pliku movies.csv.");
+  } catch (error) {
+    console.log("Wystąpił błąd:", error);
+  }
 }
 
 async function main() {
@@ -79,7 +82,6 @@ async function main() {
     const movies = await getMovies();
     const deduplicatedMovies = await deduplicate(movies);
     await saveToCSV(deduplicatedMovies);
-    console.log("Dane zostały zapisane do pliku movies.csv.");
   } catch (error) {
     console.log("Wystąpił błąd:", error);
   }

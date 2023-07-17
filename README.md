@@ -1,12 +1,12 @@
 # Task - Movie Scraper
 
 ## Descritpion 
-Create a simple web scraper that will download titles and ra3ngs of movies from filmweb.pl
+Create a simple web scraper that will download titles and ratings of movies from filmweb.pl
 (https://www.filmweb.pl/ranking/vod/film). Scraped movies should be from actual year and
 you should include only top 4 VOD services (Netflix, Max, Canal +, Disney). From each VOD
 movies list, you should scrape only 10 top movies. Then you should deduplicate (if needed)
 by movie title (higher rating should be saved). Results should be saved in CSV file format
-with such columns: Title, VOD service name, ra3ng. Results should be ordered by rating in
+with such columns: Title, VOD service name, rating. Results should be ordered by rating in
 descending order.
 While implementing solution please have in mind an efficiency and time to delivery. You can
 use whatever NPM packages you want.
